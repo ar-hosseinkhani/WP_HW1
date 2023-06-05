@@ -84,7 +84,7 @@ func (a *AuthHandler) Req_DHParams(ctx context.Context, req *api.RequestReqDHPar
 func main() {
 	handler := &AuthHandler{}
 	handler.RedisDB = redis.NewRedisWithOption(redis.Option{
-		Host:       "localhost",
+		Host:       "myredis",
 		Port:       "6379",
 		PoolSize:   10,
 		DB:         0,
