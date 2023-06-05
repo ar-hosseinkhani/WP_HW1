@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "src/golang";
+
+message RequestReqPQ {
+  string nonce = 1;
+  int32 message_id = 2;
+}
+
+message ResponseReqPQ {
+  string nonce = 1;
+  string server_nonce = 2;
+  int32 message_id = 3;
+  int64 p = 4;
+  int64 g = 5;
+}
+
+message RequestReqDHParams {
+  string nonce = 1;
+  string server_nonce = 2;
+  int32 message_id = 3;
+  int64 a = 4;
+}
+
+message ResponseReqDHParams {
+  string nonce = 1;
+  string server_nonce = 2;
+  int32 message_id = 3;
+  int64 b = 4;
+}
+
+service Auth {
+  rpc req_pq(RequestReqPQ) returns (ResponseReqPQ);
+  rpc req_DH_params(RequestReqDHParams) returns (ResponseReqDHParams);
+}
