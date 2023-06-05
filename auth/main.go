@@ -6,6 +6,7 @@ import (
 	"WP/pkg/redis"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
@@ -32,6 +33,7 @@ func (a *AuthHandler) ReqPq(ctx context.Context, req *api.RequestReqPQ) (*api.Re
 	err := SetRedis(ctx, a.RedisDB, redisKey, pgHolder, time.Minute*20)
 	if err != nil {
 		log.Printf("insert to redis failed: %s", err.Error())
+		return nil, err
 	}
 
 	return &api.ResponseReqPQ{
@@ -51,30 +53,33 @@ func (a *AuthHandler) Req_DHParams(ctx context.Context, req *api.RequestReqDHPar
 	value, err := a.RedisDB.Get(ctx, redisKey).Result()
 	if err != nil {
 		log.Printf("read from redis failed: %s", err)
-		return nil, err
+		return nil, errors.New("you should call ReqPQ first")
 	}
+
 	var pgHolder *models.PGHolder
 	err = json.Unmarshal([]byte(value), &pgHolder)
 	if err != nil {
 		log.Printf("json unmarshal failed: %s", err)
-		return nil, err
+		return nil, errors.New("you should call ReqPQ first")
 	}
 
-	B := CalculatePublic(pgHolder.G, pgHolder.P, b)
-	publicKey := &models.CommonKeyHolder{
-		Key: B,
+	publicKey := &models.KeyHolder{
+		Key: CalculatePublic(pgHolder.G, pgHolder.P, b),
+	}
+	privateKey := &models.KeyHolder{
+		Key: CalculatePrivate(pgHolder.P, req.A, b),
 	}
 
-	privateKey := CalculatePrivate(pgHolder.P, req.A, b)
-	log.Printf("private: %d", privateKey)
+	log.Printf("private: %d", privateKey.Key)
+	log.Printf("public: %d", publicKey.Key)
 
-	err = SetRedis(ctx, a.RedisDB, redisKey, publicKey, time.Minute*20)
+	err = SetRedis(ctx, a.RedisDB, redisKey, privateKey, time.Minute*20)
 	if err != nil {
 		log.Printf("insert to redis failed: %s", err.Error())
 	}
 
 	return &api.ResponseReqDHParams{
-		B:           int64(int32(B)),
+		B:           publicKey.Key,
 		Nonce:       req.Nonce,
 		ServerNonce: req.ServerNonce,
 		MessageId:   100, // TODO

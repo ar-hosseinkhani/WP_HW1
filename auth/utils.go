@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"github.com/fxtlabs/primes"
-	"log"
 	"math"
 	"math/rand"
 	"time"
@@ -57,7 +56,6 @@ func SetRedis(ctx context.Context, redisDB *redis.Redis, key string, value inter
 }
 
 func CalculatePublic(g int64, p int64, b int64) int64 {
-	log.Printf("g: %d p: %d b: %d", g, p, b)
 	return int64(math.Pow(float64(g), float64(b))) % p
 }
 

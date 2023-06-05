@@ -5,7 +5,7 @@ type PGHolder struct {
 	G int64
 }
 
-type CommonKeyHolder struct {
+type KeyHolder struct {
 	Key int64
 }
 

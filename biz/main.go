@@ -6,7 +6,9 @@ import (
 	"WP/pkg/postgres"
 	"WP/pkg/redis"
 	"context"
+	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v4"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -24,6 +26,9 @@ func (b *BizHandler) GetUsers(ctx context.Context, req *api.RequestGetUsers) (*a
 
 	if req.UserId != 0 {
 		user, err := b.UserRepo.FindById(ctx, req.UserId)
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
 		if err != nil {
 			log.Printf("read from postgres failed: %s", err)
 			return nil, err
@@ -31,6 +36,9 @@ func (b *BizHandler) GetUsers(ctx context.Context, req *api.RequestGetUsers) (*a
 		users = append(users, UserToProto(user))
 	} else {
 		userObjects, err := b.UserRepo.FindByLimit(ctx, 100)
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
 		if err != nil {
 			log.Printf("read from postgres failed: %s", err)
 			return nil, err
@@ -51,6 +59,9 @@ func (b *BizHandler) GetUsersWithSqlInjection(ctx context.Context, req *api.Requ
 
 	if req.UserId != "" {
 		user, err := b.UserRepo.FindByIdWithInjection(ctx, req.UserId)
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
 		if err != nil {
 			log.Printf("read from postgres failed: %s", err)
 			return nil, err
@@ -58,6 +69,9 @@ func (b *BizHandler) GetUsersWithSqlInjection(ctx context.Context, req *api.Requ
 		users = append(users, UserToProto(user))
 	} else {
 		userObjects, err := b.UserRepo.FindByLimit(ctx, 100)
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
 		if err != nil {
 			log.Printf("read from postgres failed: %s", err)
 			return nil, err
@@ -76,7 +90,7 @@ func (b *BizHandler) GetUsersWithSqlInjection(ctx context.Context, req *api.Requ
 func main() {
 	handler := &BizHandler{}
 	handler.RedisDB = redis.NewRedisWithOption(redis.Option{
-		Host:       "localhost",
+		Host:       "myredis",
 		Port:       "6379",
 		PoolSize:   10,
 		DB:         0,
@@ -84,13 +98,13 @@ func main() {
 		MaxRetries: 1,
 	})
 	handler.MasterPg = postgres.NewPGXPostgres(postgres.Option{
-		Host: "localhost",
+		Host: "postgres",
 		Port: 5432,
 		User: "postgres",
 		Pass: "1234",
 		Db:   "users",
 	}, 1000)
-	handler.UserRepo = repos.NewUsersRepository(handler.MasterPg)
+	handler.UserRepo = repos.NewUsersRepository(handler.MasterPg, repos.UsersRepoOptionWithTableName("users"), repos.UsersRepoOptionWithAutoCreate())
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 5062))
 	if err != nil {

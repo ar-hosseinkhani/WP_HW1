@@ -26,11 +26,15 @@ type UsersRepositoryImpl struct {
 	tableName string
 }
 
-func NewUsersRepository(masterPg *postgres.PGXDatabase) UsersRepository {
+func NewUsersRepository(masterPg *postgres.PGXDatabase, options ...UsersRepoOption) UsersRepository {
 
 	pr := UsersRepositoryImpl{
 		masterPg:  masterPg,
 		tableName: "users",
+	}
+
+	for _, option := range options {
+		pr = option(pr)
 	}
 
 	return &pr
