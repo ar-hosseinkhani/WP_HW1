@@ -22,6 +22,15 @@ type BizHandler struct {
 }
 
 func (b *BizHandler) GetUsers(ctx context.Context, req *api.RequestGetUsers) (*api.ResponseGetUsers, error) {
+
+	exists, err := b.RedisDB.Exists(ctx, fmt.Sprintf("auth:%d", req.AuthKey)).Result()
+	if err != nil {
+		log.Printf("Error in authentication: %s", err.Error())
+	}
+	if exists != 1 {
+		return nil, errors.New("authentication failed")
+	}
+
 	var users []*api.User
 
 	if req.UserId != 0 {
@@ -50,11 +59,20 @@ func (b *BizHandler) GetUsers(ctx context.Context, req *api.RequestGetUsers) (*a
 
 	return &api.ResponseGetUsers{
 		Users:     users,
-		MessageId: 100, // TODO
+		MessageId: req.MessageId + 1,
 	}, nil
 }
 
 func (b *BizHandler) GetUsersWithSqlInjection(ctx context.Context, req *api.RequestGetUsersWithSQLInjection) (*api.ResponseGetUsers, error) {
+
+	exists, err := b.RedisDB.Exists(ctx, fmt.Sprintf("auth:%d", req.AuthKey)).Result()
+	if err != nil {
+		log.Printf("Error in authentication: %s", err.Error())
+	}
+	if exists != 1 {
+		return nil, errors.New("authentication failed")
+	}
+
 	var users []*api.User
 
 	if req.UserId != "" {
@@ -83,14 +101,14 @@ func (b *BizHandler) GetUsersWithSqlInjection(ctx context.Context, req *api.Requ
 
 	return &api.ResponseGetUsers{
 		Users:     users,
-		MessageId: 100, // TODO
+		MessageId: req.MessageId + 1,
 	}, nil
 }
 
 func main() {
 	handler := &BizHandler{}
 	handler.RedisDB = redis.NewRedisWithOption(redis.Option{
-		Host:       "myredis",
+		Host:       "redis",
 		Port:       "6379",
 		PoolSize:   10,
 		DB:         0,

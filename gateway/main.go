@@ -19,10 +19,10 @@ type GatewayHandler struct {
 func main() {
 	handler := GatewayHandler{}
 
-	authConn := getGRPCConn("127.0.0.1:5052")
+	authConn := getGRPCConn("auth:5052")
 	handler.authClient = api.NewAuthClient(authConn)
 
-	bizConn := getGRPCConn("127.0.0.1:5062")
+	bizConn := getGRPCConn("biz:5062")
 	handler.bizClient = api2.NewBizClient(bizConn)
 
 	handler.httpHandler = http.NewHandler(handler.authClient, handler.bizClient)

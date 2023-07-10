@@ -79,6 +79,11 @@ func (a *AuthHandler) Req_DHParams(ctx context.Context, req *api.RequestReqDHPar
 		log.Printf("insert to redis failed: %s", err.Error())
 	}
 
+	err = SetRedis(ctx, a.RedisDB, fmt.Sprintf("auth:%d", publicKey.Key), publicKey.Key, time.Minute*20)
+	if err != nil {
+		log.Printf("insert public key to redis failed: %s", err.Error())
+	}
+
 	return &api.ResponseReqDHParams{
 		B:           publicKey.Key,
 		Nonce:       req.Nonce,
