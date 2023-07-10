@@ -14,8 +14,6 @@ import (
 	"time"
 )
 
-const BBound = 10
-
 type AuthHandler struct {
 	api.UnimplementedAuthServer
 	RedisDB *redis.Redis
@@ -24,12 +22,15 @@ type AuthHandler struct {
 func (a *AuthHandler) ReqPq(ctx context.Context, req *api.RequestReqPQ) (*api.ResponseReqPQ, error) {
 	serverNonce := RandString(20)
 	redisKey := GetSHA1EncodedString(req.Nonce + serverNonce)
-	//p, g := GeneratePG()
-	var p, g int64 = 23, 5
+	p, g := GeneratePG()
 	pgHolder := &models.PGHolder{
 		G: g,
 		P: p,
 	}
+
+	log.Printf("P: %d", p)
+	log.Printf("G: %d", g)
+
 	err := SetRedis(ctx, a.RedisDB, redisKey, pgHolder, time.Minute*20)
 	if err != nil {
 		log.Printf("insert to redis failed: %s", err.Error())
@@ -41,7 +42,7 @@ func (a *AuthHandler) ReqPq(ctx context.Context, req *api.RequestReqPQ) (*api.Re
 		ServerNonce: serverNonce,
 		P:           p,
 		G:           g,
-		MessageId:   100, // TODO
+		MessageId:   req.MessageId + 1,
 	}, nil
 }
 
@@ -82,14 +83,14 @@ func (a *AuthHandler) Req_DHParams(ctx context.Context, req *api.RequestReqDHPar
 		B:           publicKey.Key,
 		Nonce:       req.Nonce,
 		ServerNonce: req.ServerNonce,
-		MessageId:   100, // TODO
+		MessageId:   req.MessageId + 1,
 	}, nil
 }
 
 func main() {
 	handler := &AuthHandler{}
 	handler.RedisDB = redis.NewRedisWithOption(redis.Option{
-		Host:       "myredis",
+		Host:       "redis",
 		Port:       "6379",
 		PoolSize:   10,
 		DB:         0,

@@ -8,7 +8,3 @@ type PGHolder struct {
 type KeyHolder struct {
 	Key int64
 }
-
-type PrivateKeyHolder struct {
-	Key int64
-}
