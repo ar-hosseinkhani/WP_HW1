@@ -13,22 +13,22 @@ message ResponseReqPQ {
   string nonce = 1;
   string server_nonce = 2;
   int32 message_id = 3;
-  int64 p = 4;
-  int64 g = 5;
+  int32 p = 4;
+  int32 g = 5;
 }
 
 message RequestReqDHParams {
   string nonce = 1;
   string server_nonce = 2;
   int32 message_id = 3;
-  int64 a = 4;
+  int32 a = 4;
 }
 
 message ResponseReqDHParams {
   string nonce = 1;
   string server_nonce = 2;
   int32 message_id = 3;
-  int64 b = 4;
+  int32 b = 4;
 }
 
 service Auth {

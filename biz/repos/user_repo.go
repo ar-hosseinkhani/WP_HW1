@@ -99,7 +99,7 @@ func UsersRepoOptionWithAutoCreate() UsersRepoOption {
 			id SERIAL PRIMARY KEY,
 			age integer not null,
 			sex varchar(20) not null,
-			created_at timestamp not null default now(),
+			created_at timestamp not null default now()
 		);`, repo.tableName)
 		_, err := repo.masterPg.Exec(context.Background(), scheme)
 		if err != nil {

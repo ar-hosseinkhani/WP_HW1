@@ -14,7 +14,7 @@ import (
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-const PrimeBound = 2000
+const PrimeBound = 14
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -35,10 +35,10 @@ func RandString(n int) string {
 	return string(b)
 }
 
-func GeneratePG() (int64, int64) {
+func GeneratePG() (int32, int32) {
 	p := generatePrimeNumber(PrimeBound)
 	g := rand.Intn(p)
-	return int64(p), int64(g)
+	return int32(p), int32(g)
 }
 
 func generatePrimeNumber(bound int) int {
@@ -55,10 +55,10 @@ func SetRedis(ctx context.Context, redisDB *redis.Redis, key string, value inter
 	return err
 }
 
-func CalculatePublic(g int64, p int64, b int64) int64 {
-	return int64(math.Pow(float64(g), float64(b))) % p
+func CalculatePublic(g int32, p int32, b int32) int32 {
+	return int32(math.Pow(float64(g), float64(b))) % p
 }
 
-func CalculatePrivate(p int64, A int64, b int64) int64 {
-	return int64(math.Pow(float64(A), float64(b))) % p
+func CalculatePrivate(p int32, A int32, b int32) int32 {
+	return int32(math.Pow(float64(A), float64(b))) % p
 }

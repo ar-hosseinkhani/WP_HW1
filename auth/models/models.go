@@ -1,10 +1,10 @@
 package models
 
 type PGHolder struct {
-	P int64
-	G int64
+	P int32
+	G int32
 }
 
 type KeyHolder struct {
-	Key int64
+	Key int32
 }

@@ -10,9 +10,12 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
+	"math/rand"
 	"net"
 	"time"
 )
+
+const BBound = 5
 
 type AuthHandler struct {
 	api.UnimplementedAuthServer
@@ -47,8 +50,7 @@ func (a *AuthHandler) ReqPq(ctx context.Context, req *api.RequestReqPQ) (*api.Re
 }
 
 func (a *AuthHandler) Req_DHParams(ctx context.Context, req *api.RequestReqDHParams) (*api.ResponseReqDHParams, error) {
-	//b := rand.Intn(BBound)
-	var b int64 = 15
+	b := int32(rand.Intn(BBound))
 
 	redisKey := GetSHA1EncodedString(req.Nonce + req.ServerNonce)
 	value, err := a.RedisDB.Get(ctx, redisKey).Result()
