@@ -44,7 +44,7 @@ type ResponseReqDHParams struct {
 type RequestGetUsers struct {
 	UserId    int32 `json:"user_id"`
 	MessageId int32 `json:"message_id"`
-	AuthKey   int32 `json:"auth_key"`
+	AuthKey   int64 `json:"auth_key"`
 }
 
 type ResponseGetUsers struct {
@@ -55,7 +55,7 @@ type ResponseGetUsers struct {
 type RequestGetUsersWithInj struct {
 	UserId    string `json:"user_id"`
 	MessageId int32  `json:"message_id"`
-	AuthKey   int32  `json:"auth_key"`
+	AuthKey   int64  `json:"auth_key"`
 }
 
 type ResponseGetUsersWithInj struct {
