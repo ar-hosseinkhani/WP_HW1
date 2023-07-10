@@ -11,8 +11,8 @@ type ResponseReqPQ struct {
 	Nonce       string `json:"nonce"`
 	ServerNonce string `json:"server_nonce"`
 	MessageId   int32  `json:"message_id"`
-	P           int64  `json:"p"`
-	G           int64  `json:"g"`
+	P           int32  `json:"p"`
+	G           int32  `json:"g"`
 }
 
 type User struct {
@@ -27,14 +27,14 @@ type RequestReqDHParams struct {
 	Nonce       string `json:"nonce"`
 	ServerNonce string `json:"server_nonce"`
 	MessageId   int32  `json:"message_id"`
-	A           int64  `json:"a"`
+	A           int32  `json:"a"`
 }
 
 type ResponseReqDHParams struct {
 	Nonce       string `json:"nonce"`
 	ServerNonce string `json:"server_nonce"`
 	MessageId   int32  `json:"message_id"`
-	B           int64  `json:"b"`
+	B           int32  `json:"b"`
 }
 
 //--------------------------------------------
@@ -44,7 +44,7 @@ type ResponseReqDHParams struct {
 type RequestGetUsers struct {
 	UserId    int32 `json:"user_id"`
 	MessageId int32 `json:"message_id"`
-	AuthKey   int64 `json:"auth_key"`
+	AuthKey   int32 `json:"auth_key"`
 }
 
 type ResponseGetUsers struct {
@@ -55,7 +55,7 @@ type ResponseGetUsers struct {
 type RequestGetUsersWithInj struct {
 	UserId    string `json:"user_id"`
 	MessageId int32  `json:"message_id"`
-	AuthKey   int64  `json:"auth_key"`
+	AuthKey   int32  `json:"auth_key"`
 }
 
 type ResponseGetUsersWithInj struct {

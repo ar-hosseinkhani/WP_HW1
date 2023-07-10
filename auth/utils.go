@@ -36,8 +36,15 @@ func RandString(n int) string {
 }
 
 func GeneratePG() (int32, int32) {
+	// TODO: some of these constraints are not necessary
 	p := generatePrimeNumber(PrimeBound)
+	for p < 3 {
+		p = generatePrimeNumber(PrimeBound)
+	}
 	g := rand.Intn(p)
+	for g == 0 {
+		g = rand.Intn(p)
+	}
 	return int32(p), int32(g)
 }
 
